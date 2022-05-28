@@ -1,1 +1,1 @@
-https://ashkitty.com, my personal webpage C:  
+my personal webpage https://ashkitty.com
