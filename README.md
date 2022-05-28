@@ -1,2 +1,1 @@
-# ashkitty.com
-my personal webpage C:
+access it here: https://ashkitty.com
