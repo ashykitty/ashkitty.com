@@ -3,7 +3,7 @@ from fastapi.responses import HTMLResponse
 from plyer import notification
 from pydantic import BaseModel
 from fastapi import FastAPI
-import templates
+import generator 
 import subprocess as sp
 import time
     
@@ -23,20 +23,8 @@ def meow(model: Model):
     else:
         return "message too long >:c"
 
-@app.get("/iloveu")
-def iloveu():
-    pass
-
-@app.get("/fix")
-def fix():
-    pyautogui.press('space')
-    pyautogui.press('f')
-    time.sleep(2)
-    pyautogui.press('f')
-    pyautogui.press('space')
-
 @app.get("/", response_class=HTMLResponse)
 async def root():
     hour = time.localtime().tm_hour
-    return templates.base(templates.main(),hour < 6)
+    return generator.base(generator.main(),hour < 6)
     
