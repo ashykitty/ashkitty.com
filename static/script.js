@@ -11,12 +11,3 @@ async function meow(encode)
 	box.value = await res.json();
 }
 
-async function spooky()
-{
-	const banner = document.getElementsByClassName("banner")[0];
-	banner.src = "static/spooky.gif";
-	
-	const background = document.getElementsByClassName("background")[0];
-	background.background_image = "#000000FF";
-	
-}
