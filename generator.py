@@ -2,7 +2,7 @@ from datetime import date
 from datetime import datetime
 import random
 
-APP_VERSION = 2.2
+APP_VERSION = 2.3
 TEMPLATES = "templates/"
 
 global days
@@ -18,16 +18,24 @@ def load_assets():
 
 def main():
     with open(TEMPLATES+"main.html") as main:
-        html = main.read()
-        while "{EMOJIS}" in html:
-            html = html.replace("{EMOJIS}", random.choice( emojis),1)
-        return html
-        
+        return main.read()
+ 
+def add_emojis( html):
+    while "{EMOJIS}" in html:
+        html = html.replace("{EMOJIS}", random.choice( emojis),1)
+    return html
+
+       
 def base(BODY,night):
     days_msg = str((date.today()-date(2021,9,8)).days)
     days_msg = " ".join([days_msg,random.choice(days),"days with u <3"])
+
+    BODY = add_emojis( BODY)
+
     with open(TEMPLATES+"base.html") as base:
         html = base.read()
+        html = add_emojis( html)
+
         html = html.format(
             TITLE="ash's page",
             VERSION=APP_VERSION,
@@ -36,7 +44,7 @@ def base(BODY,night):
             STYLESHEET="night" if night else "style",
             BANNER="night.gif" if night else "us.png"
         )
-        
+
         return html
 
 load_assets()
