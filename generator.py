@@ -3,25 +3,25 @@ from datetime import datetime
 import time
 import random
 
-APP_VERSION = 2.4
+APP_VERSION = 2.5
 TEMPLATES = "templates/"
 
-global days
-global emojis
+global DAYS 
+global EMOJIS 
 
 def load_assets():
-    global days
-    global emojis
+    global DAYS 
+    global EMOJIS 
 
     with open("assets/days.txt") as file:
-        days = file.readlines()
+        DAYS = file.read().split("\n")
 
-    with open("assets/emojis.txt",encoding="utf8") as file:
-        emojis = file.readlines()
+    with open("assets/emojis.txt", encoding="utf8") as file:
+        EMOJIS = file.read().split("\n")
 
 def add_emojis( html):
-    while "{EMOJIS}" in html:
-        html = html.replace( "{EMOJIS}", random.choice( emojis), 1)
+    while "{EMOJI}" in html:
+        html = html.replace( "{EMOJI}", random.choice( EMOJIS), 1)
     return html
 
 def read_page( page_name):
@@ -34,9 +34,20 @@ def read_page( page_name):
 def is_night():
     return time.localtime().tm_hour < 6 
 
+def get_special_message():
+    days_since = (date.today()-date(2021,9,8)).days
+
+    if date.today().day == 8:
+        months = int( days_since / 30)
+        msg = f"HAPPY {months} MONTHS ANNIVERSARY!! {random.choice(EMOJIS)}"
+    else:
+        msg = f"{days_since} {random.choice(DAYS)} days with u <3"
+
+    return msg
+
+
 def generate( page):
-    days_msg = str((date.today()-date(2021,9,8)).days)
-    days_msg = " ".join([days_msg,random.choice(days),"days with u <3"])
+    days_msg = get_special_message()
 
     base = read_page( "base")
     page = read_page( page)
