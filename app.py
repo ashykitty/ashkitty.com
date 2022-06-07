@@ -6,7 +6,6 @@ from pydantic import BaseModel
 from fastapi import FastAPI
 import generator 
 import subprocess as sp
-import time
     
 app = FastAPI(redoc_url=None,docs_url=None)
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -30,6 +29,9 @@ def robots():
 
 @app.get("/", response_class=HTMLResponse)
 async def root():
-    hour = time.localtime().tm_hour
-    return generator.base(generator.main(),hour < 6)
-    
+    return generator.generate( "root")[0]
+
+@app.get("/{page}", response_class=HTMLResponse)
+async def getpage(page):
+    page, code = generator.generate( page)
+    return HTMLResponse( content = page, status_code = code)
