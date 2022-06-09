@@ -20,14 +20,17 @@ def load_assets():
         EMOJIS = file.read().split("\n")
 
 def add_emojis( html):
-    while "{EMOJI}" in html:
-        html = html.replace( "{EMOJI}", random.choice( EMOJIS), 1)
+    while "(EMOJI)" in html:
+        html = html.replace( "(EMOJI)", random.choice( EMOJIS), 1)
     return html
 
-def read_page( page_name):
+def read_page( page_name, emojis = True):
     try:
-        with open( f"{TEMPLATES}{page_name}.html") as page:
-            return add_emojis( page.read())
+        with open( f"{TEMPLATES}{page_name}.html", encoding="utf-8") as page:
+            if emojis:
+                return add_emojis( page.read())
+            else:
+                return page.read()
     except:
         return None
     
@@ -45,30 +48,22 @@ def get_special_message():
 
     return msg
 
-
 def generate( page):
     days_msg = get_special_message()
 
     base = read_page( "base")
-    page = read_page( page)
-
-    if not page:
-        page = read_page( "notfound")
-        code = 404
-    else:
-        code = 200
 
     night = time.localtime().tm_hour < 6
 
-    base = base.format(
+    page = base.format(
         TITLE      = "ash's page",
         VERSION    = APP_VERSION,
         DAYS       = days_msg,
         BODY       = page,
         STYLESHEET = "night"     if night else "style",
-        BANNER     = "night.gif" if night else "us.png"
+        BANNER     = "night.gif" if night else "us2.svg"
     )
 
-    return ( base, code)
+    return page 
 
 load_assets()
