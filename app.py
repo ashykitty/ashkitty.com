@@ -36,7 +36,7 @@ async def xkcd(page_num):
     page_num = int(page_num)
     per_page = 8
     
-    with open("assets/xkcd.txt") as file:
+    with open("assets/xkcd2.txt") as file:
         links = file.read().split("\n")
         
     total_pages = len(links) // per_page
