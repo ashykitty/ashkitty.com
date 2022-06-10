@@ -8,7 +8,7 @@ import generator as g
 import subprocess as sp
     
 app = FastAPI(redoc_url=None,docs_url=None)
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/files", StaticFiles(directory="files"), name="files")
 #app.mount("/adarkroom", StaticFiles(directory="../adarkroom"), name="adarkroom")
 #app.mount("/cursedSouls", StaticFiles(directory="../cursedSouls"), name="cursedSouls")
 #app.mount("/SpaceHuggers", StaticFiles(directory="../SpaceHuggers"), name="SpaceHuggers")
@@ -31,7 +31,7 @@ def robots():
 
 @app.get("/", response_class=HTMLResponse)
 async def root():
-    return g.generate( g.read_page( "root"))
+    return g.generate( g.read_page( "templates/root"))
 
 @app.get("/xkcd/{page_num}", response_class=HTMLResponse)
 async def xkcd(page_num):
@@ -44,12 +44,12 @@ async def xkcd(page_num):
     total_pages = len(links) // per_page
 
     if page_num < 0 or page_num > total_pages:
-        return g.generate( g.read_page( "notfound"))
+        return g.generate( g.read_page( "templates/notfound"))
        
     links = list(reversed(links))
     links = links[page_num*per_page:page_num*per_page+per_page]
 
-    post = g.read_page( "xkcd_post", False)
+    post = g.read_page( "templates/xkcd_post", False)
     posts = ""
 
     for link in links:
@@ -61,7 +61,7 @@ async def xkcd(page_num):
 
     btn = "<a href=\"/xkcd/{}\"><button>{}</button></a>"
 
-    xkcd_page = g.read_page( "xkcd").format(
+    xkcd_page = g.read_page( "templates/xkcd").format(
             BODY=posts,
             PAGES=f"{page_num}/{total_pages}",
             PREV=btn.format(page_num-1,"prev") if page_num > 0 else "",
@@ -73,5 +73,11 @@ async def xkcd(page_num):
 
 @app.get("/{page}", response_class=HTMLResponse)
 async def getpage(page):
-    page = g.generate( g.read_page( "notfound"))
+    page = g.read_page( f"static/{page}")
+
+    if page:
+        page = g.generate( page)
+        return HTMLResponse( content = page, status_code = 200)
+
+    page = g.generate( g.read_page( "templates/notfound"))
     return HTMLResponse( content = page, status_code = 404)

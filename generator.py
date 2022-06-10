@@ -4,7 +4,6 @@ import time
 import random
 
 APP_VERSION = 2.5
-TEMPLATES = "templates/"
 
 global DAYS 
 global EMOJIS 
@@ -26,7 +25,7 @@ def add_emojis( html):
 
 def read_page( page_name, emojis = True):
     try:
-        with open( f"{TEMPLATES}{page_name}.html", encoding="utf-8") as page:
+        with open( f"{page_name}.html", encoding="utf-8") as page:
             if emojis:
                 return add_emojis( page.read())
             else:
@@ -50,7 +49,7 @@ def generate( page):
 
     night = is_night() 
 
-    return read_page( "base").format(
+    return read_page( "templates/base").format(
         TITLE      = "ash's page",
         VERSION    = APP_VERSION,
         DAYS       = get_special_message(),
