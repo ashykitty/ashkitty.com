@@ -9,7 +9,9 @@ import subprocess as sp
     
 app = FastAPI(redoc_url=None,docs_url=None)
 app.mount("/static", StaticFiles(directory="static"), name="static")
-app.mount("/adarkroom", StaticFiles(directory="../adarkroom"), name="adarkroom")
+#app.mount("/adarkroom", StaticFiles(directory="../adarkroom"), name="adarkroom")
+#app.mount("/cursedSouls", StaticFiles(directory="../cursedSouls"), name="cursedSouls")
+#app.mount("/SpaceHuggers", StaticFiles(directory="../SpaceHuggers"), name="SpaceHuggers")
 
 class Model(BaseModel):
     encode: bool
@@ -57,11 +59,13 @@ async def xkcd(page_num):
     
     posts = g.add_emojis( posts)
 
+    btn = "<a href=\"/xkcd/{}\"><button>{}</button></a>"
+
     xkcd_page = g.read_page( "xkcd").format(
             BODY=posts,
             PAGES=f"{page_num}/{total_pages}",
-            PREV=f"{page_num-1}" if page_num > 0 else f"{page_num}",
-            NEXT=f"{page_num+1}" if page_num < total_pages else f"{page_num}",
+            PREV=btn.format(page_num-1,"prev") if page_num > 0 else "",
+            NEXT=btn.format(page_num+1,"next") if page_num < total_pages else "",
             PAGE=f"{page_num}"
         )
 

@@ -42,28 +42,21 @@ def get_special_message():
 
     if date.today().day == 8:
         months = int( days_since / 30)
-        msg = f"HAPPY {months} MONTHS ANNIVERSARY!! {random.choice(EMOJIS)}"
+        return f"HAPPY {months} MONTHS ANNIVERSARY!! {random.choice(EMOJIS)}"
     else:
-        msg = f"{days_since} {random.choice(DAYS)} days with u <3"
-
-    return msg
+        return f"{days_since} {random.choice(DAYS)} days with u <3"
 
 def generate( page):
-    days_msg = get_special_message()
 
-    base = read_page( "base")
+    night = is_night() 
 
-    night = time.localtime().tm_hour < 6
-
-    page = base.format(
+    return read_page( "base").format(
         TITLE      = "ash's page",
         VERSION    = APP_VERSION,
-        DAYS       = days_msg,
+        DAYS       = get_special_message(),
         BODY       = page,
         STYLESHEET = "night"     if night else "style",
         BANNER     = "night.gif" if night else "us2.svg"
     )
-
-    return page 
 
 load_assets()
