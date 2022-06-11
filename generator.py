@@ -12,10 +12,10 @@ def load_assets():
     global DAYS 
     global EMOJIS 
 
-    with open("assets/days.txt") as file:
+    with open("data/days.txt") as file:
         DAYS = file.read().split("\n")
 
-    with open("assets/emojis.txt", encoding="utf8") as file:
+    with open("data/emojis.txt", encoding="utf8") as file:
         EMOJIS = file.read().split("\n")
 
 def add_emojis( html):
