@@ -56,9 +56,9 @@ def handle( request, path, content):
                 page = generate( xkcd( path[1]))
                 return page
             else:
-                return self.notfound()
+                return notfound()
     else:
-        return self.notfound()
+        return notfound()
 
 def xkcd(page_num):
     page_num = int(page_num)
