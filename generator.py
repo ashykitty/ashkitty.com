@@ -1,4 +1,5 @@
 from datetime import date
+import subprocess as sp
 from datetime import datetime
 import time
 import random
@@ -23,7 +24,7 @@ def meow( content):
     content = content.split(":")
     if len(content[1]) < 2048:
         c = "-e" if content[0] == "true" else "-d"
-        return sp.run(["../catcoder/meow",ac,content[1].strip()],capture_output=True).stdout
+        return sp.run(["../catcoder/meow",c,content[1].strip()],capture_output=True).stdout
     else:
         return "message too long >:c"
        
