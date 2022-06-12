@@ -1,82 +1,34 @@
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse
-from fastapi.responses import PlainTextResponse
-from pydantic import BaseModel
-from fastapi import FastAPI
 import generator as g 
 import subprocess as sp
-    
-app = FastAPI(redoc_url=None,docs_url=None)
-app.mount("/files", StaticFiles(directory="files"), name="files")
-#app.mount("/adarkroom", StaticFiles(directory="../adarkroom"), name="adarkroom")
-#app.mount("/cursedSouls", StaticFiles(directory="../cursedSouls"), name="cursedSouls")
-#app.mount("/SpaceHuggers", StaticFiles(directory="../SpaceHuggers"), name="SpaceHuggers")
+import socketserver
+import re
 
-class Model(BaseModel):
-    encode: bool
-    msg: str
-
-@app.post("/meow/")
-def meow(model: Model):
-    if len(model.msg) < 2048:
-        ac = "-e" if model.encode else "-d"
-        return sp.run(["../catcoder/meow",ac,model.msg.strip()],capture_output=True).stdout
-    else:
-        return "message too long >:c"
-
-@app.get("/robots.txt")
-def robots():
-    return PlainTextResponse(content="User-agent: *\nDisallow: /", status_code=200) 
-
-@app.get("/", response_class=HTMLResponse)
-async def root():
-    return g.generate( g.read_page( "templates/root"))
-
-@app.get("/xkcd/{page_num}", response_class=HTMLResponse)
-async def xkcd(page_num):
-    page_num = int(page_num)
-    per_page = 8
-    
-    with open("data/xkcd2.txt") as file:
-        links = file.read().split("\n")
+class Handler( socketserver.BaseRequestHandler):
+    def setup( self):
+        exp = r"^(?P<request>.*) /(?P<path>.*) (.|\n)*\n(?P<content>.*)"
         
-    total_pages = len(links) // per_page
+        self.re_file = re.compile( exp)
 
-    if page_num < 0 or page_num > total_pages:
-        return g.generate( g.read_page( "templates/notfound"))
-       
-    links = list(reversed(links))
-    links = links[page_num*per_page:page_num*per_page+per_page]
+    def send( self, content, code = True):
+        if code:
+            code = b"HTTP/1.1 200 OK\n\n"
+        else:
+            code = b"HTTP/1.1 404 Not Found\n\n"
+        
+        self.request.sendall(code+content)
+        
+    def handle( self):
 
-    post = g.read_page( "templates/xkcd_post", False)
-    posts = ""
+        data = self.request.recv(1024).decode('utf-8')
+        data = self.re_file.search(data)
+        
+        req     = data.group("request")
+        path    = data.group("path")
+        content = data.group("content")
 
-    for link in links:
-        title = link.split("/")[-1].split(".")[0]
-        title = title.replace("_"," ")
-        posts += post.format(TITLE=title,LINK=link)
-    
-    posts = g.add_emojis( posts)
-
-    btn = "<a href=\"/xkcd/{}\"><button>{}</button></a>"
-
-    xkcd_page = g.read_page( "templates/xkcd").format(
-            BODY=posts,
-            PAGES=f"{page_num}/{total_pages}",
-            PREV=btn.format(page_num-1,"prev") if page_num > 0 else "",
-            NEXT=btn.format(page_num+1,"next") if page_num < total_pages else "",
-            PAGE=f"{page_num}"
-        )
-
-    return g.generate( xkcd_page)
-
-@app.get("/{page}", response_class=HTMLResponse)
-async def getpage(page):
-    page = g.read_page( f"static/{page}")
-
-    if page:
-        page = g.generate( page)
-        return HTMLResponse( content = page, status_code = 200)
-
-    page = g.generate( g.read_page( "templates/notfound"))
-    return HTMLResponse( content = page, status_code = 404)
+        self.send( g.handle( req, path, content))
+        
+if __name__ == "__main__":
+    socketserver.TCPServer.allow_reuse_address = True
+    with socketserver.TCPServer( ('0.0.0.0', 6969), Handler) as server:
+        server.serve_forever()

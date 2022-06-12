@@ -2,8 +2,9 @@ from datetime import date
 from datetime import datetime
 import time
 import random
+import os
 
-APP_VERSION = 2.5
+APP_VERSION = 3.0
 
 global DAYS 
 global EMOJIS 
@@ -17,6 +18,93 @@ def load_assets():
 
     with open("data/emojis.txt", encoding="utf8") as file:
         EMOJIS = file.read().split("\n")
+
+
+        
+def meow( content):
+    content = content.split(":")
+    if len(content[1]) < 2048:
+        c = "-e" if content[0] == "true" else "-d"
+        return sp.run(["../catcoder/meow",ac,content[1].strip()],capture_output=True).stdout
+    else:
+        return "message too long >:c"
+       
+def handle_post( path, content):
+    if path == "meow":
+        self.send( self.meow( content))
+    else:
+        self.notfound()
+
+def notfound():
+    return generate( read_page( "templates/notfound"))
+
+def handle( request, path, content):
+    
+    files = os.listdir("files")
+
+    if path == "":
+        page = generate( read_page( "templates/root"))
+        return page
+    
+    elif path in files:
+        with open(f"files/{path}","rb") as file:
+            return file.read()
+
+    elif path == "meow":
+        return meow( content) 
+
+    elif path.startswith("xkcd"):
+        path = path.split("/")
+        
+        if len(path) != 2:
+            return notfound()
+        else:
+            if path[1].isnumeric():
+                page = generate( xkcd( path[1]))
+                return page
+            else:
+                return self.notfound()
+    else:
+        return self.notfound()
+
+def xkcd(page_num):
+    page_num = int(page_num)
+    per_page = 8
+    
+    with open("data/xkcd2.txt") as file:
+        links = file.read().split("\n")
+        
+    total_pages = len(links) // per_page
+
+    if page_num < 0 or page_num > total_pages:
+        return read_page( "templates/notfound")
+       
+    links = list(reversed(links))
+    links = links[page_num*per_page:page_num*per_page+per_page]
+
+    post = read_page( "templates/xkcd_post", False)
+    posts = ""
+
+    for link in links:
+        title = link.split("/")[-1].split(".")[0]
+        title = title.replace("_"," ")
+        posts += post.format(TITLE=title,LINK=link)
+    
+    posts = add_emojis( posts)
+
+    btn = "<a href=\"/xkcd/{}\"><button>{}</button></a>"
+
+    xkcd_page = read_page( "templates/xkcd").format(
+            BODY =posts,
+            PAGES=f"{page_num}/{total_pages}",
+            FIRST=btn.format(0,"&lt&lt") if page_num > 0 else "",
+            LAST =btn.format(total_pages if page_num < total_pages else "","&gt&gt"),
+            PREV =btn.format(page_num-1,"&lt") if page_num > 0 else "",
+            NEXT =btn.format(page_num+1,"&gt") if page_num < total_pages else "",
+            PAGE=f"{page_num}"
+        )
+
+    return xkcd_page
 
 def add_emojis( html):
     while "(EMOJI)" in html:
@@ -49,13 +137,15 @@ def generate( page):
 
     night = is_night() 
 
-    return read_page( "templates/base").format(
+    page = read_page( "templates/base").format(
         TITLE      = "ash's page",
         VERSION    = APP_VERSION,
         DAYS       = get_special_message(),
         BODY       = page,
-        STYLESHEET = "night"     if night else "style",
-        BANNER     = "night.gif" if night else "us2.svg"
+        STYLE      = "night.css" if night else "style.css",
+        BANNER     = "night.gif" if night else "us2.png"
     )
+
+    return str.encode( page)
 
 load_assets()
