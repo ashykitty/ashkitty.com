@@ -4,7 +4,7 @@ import time
 import random
 import os
 
-APP_VERSION = 3.0
+APP_VERSION = 3.2
 
 global DAYS 
 global EMOJIS 
@@ -19,8 +19,6 @@ def load_assets():
     with open("data/emojis.txt", encoding="utf8") as file:
         EMOJIS = file.read().split("\n")
 
-
-        
 def meow( content):
     content = content.split(":")
     if len(content[1]) < 2048:
@@ -29,12 +27,6 @@ def meow( content):
     else:
         return "message too long >:c"
        
-def handle_post( path, content):
-    if path == "meow":
-        self.send( self.meow( content))
-    else:
-        self.notfound()
-
 def notfound():
     return generate( read_page( "templates/notfound"))
 
