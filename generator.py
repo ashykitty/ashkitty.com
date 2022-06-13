@@ -11,6 +11,15 @@ APP_VERSION = 3.2
 global DAYS 
 global EMOJIS 
 
+FILE_TYPE = {
+    "png":"image/png",
+    "gif":"image/gif",
+    "html":"text/html",
+    "css":"text/css",
+    "js":"application/javascript",
+    "text":"text"
+    }
+
 def load_assets():
     global DAYS 
     global EMOJIS 
@@ -30,7 +39,8 @@ def meow( content):
         return "message too long >:c"
        
 def notfound():
-    return (generate( read_page( "templates/notfound")), Handler.HTTP_NOT,"text/html")
+    page = generage( read_page( "templates/notfound"))
+    return ( page, Handler.HTTP_NOT, FILE_TYPE["html"])
 
 def handle( request, path, content):
     
@@ -38,22 +48,17 @@ def handle( request, path, content):
 
     if path == "":
         page = generate( read_page( "templates/root"))
-        return (page, Handler.HTTP_OK, "text/html")
+        return (page, Handler.HTTP_OK, FILE_TYPE["html"])
     
     elif path in files:
         types = {
-                "png":"image/png",
-                "gif":"image/gif",
-                "html":"text/html",
-                "css":"text/css",
-                "js":"application/javascript"
-                }
+               }
         with open(f"files/{path}","rb") as file:
             ftype = path.split(".")[1]
-            return (file.read(), Handler.HTTP_OK, types[ftype])
+            return (file.read(), Handler.HTTP_OK, FILE_TYPE[ftype])
 
     elif path == "meow":
-        return (meow( content), Handler.HTTP_OK, "text")
+        return (meow( content), Handler.HTTP_OK, FILE_TYPE["text"])
 
     elif path.startswith("xkcd"):
         path = path.split("/")
@@ -63,7 +68,7 @@ def handle( request, path, content):
         else:
             if path[1].isnumeric():
                 page = generate( xkcd( path[1]))
-                return ( page, Handler.HTTP_OK, "text/html")
+                return ( page, Handler.HTTP_OK, FILE_TYPE["html"])
             else:
                 return notfound()
     else:
