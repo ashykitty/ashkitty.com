@@ -10,3 +10,5 @@ async function meow( encode)
 	box.value = await res.text();
 }
 
+document.getElementById("encode_btn").addEventListener('click', function(){meow(true)})
+document.getElementById("decode_btn").addEventListener('click', function(){meow(false)})

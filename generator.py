@@ -1,4 +1,5 @@
 from datetime import date
+from app import *
 import subprocess as sp
 from datetime import datetime
 import time
@@ -29,7 +30,7 @@ def meow( content):
         return "message too long >:c"
        
 def notfound():
-    return generate( read_page( "templates/notfound"))
+    return (generate( read_page( "templates/notfound")), Handler.HTTP_NOT,"text/html")
 
 def handle( request, path, content):
     
@@ -37,14 +38,22 @@ def handle( request, path, content):
 
     if path == "":
         page = generate( read_page( "templates/root"))
-        return page
+        return (page, Handler.HTTP_OK, "text/html")
     
     elif path in files:
+        types = {
+                "png":"image/png",
+                "gif":"image/gif",
+                "html":"text/html",
+                "css":"text/css",
+                "js":"application/javascript"
+                }
         with open(f"files/{path}","rb") as file:
-            return file.read()
+            ftype = path.split(".")[1]
+            return (file.read(), Handler.HTTP_OK, types[ftype])
 
     elif path == "meow":
-        return meow( content) 
+        return (meow( content), Handler.HTTP_OK, "text")
 
     elif path.startswith("xkcd"):
         path = path.split("/")
@@ -54,7 +63,7 @@ def handle( request, path, content):
         else:
             if path[1].isnumeric():
                 page = generate( xkcd( path[1]))
-                return page
+                return ( page, Handler.HTTP_OK, "text/html")
             else:
                 return notfound()
     else:
