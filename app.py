@@ -16,7 +16,8 @@ class Handler( socketserver.BaseRequestHandler):
         
         code = str.encode( code)
         code += b"Strict-Transport-Security: max-age=63072000; preload\n"
-        code += b"Content-Security-Policy: default-src 'self'; img-src 'self' *.xkcd.com;script-src 'self'\n"
+        code += b"Content-Security-Policy: default-src 'self';"
+        code += b"img-src 'self' *.xkcd.com;script-src 'self'\n"
         code += b"X-Content-Type-Options: nosniff\n"
         code += b"X-Frame-Options: DENY\n"
         code += b"Content-Type: "+str.encode(data_format)+b"\n"

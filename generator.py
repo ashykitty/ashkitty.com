@@ -32,14 +32,22 @@ def load_assets():
 
 def meow( content):
     content = content.split(":")
+
+    if len(content) != 2:
+        return notfound()
+
+    if content[0] not in ["true","false"]:
+        return notfound()
+
     if len(content[1]) < 2048:
         c = "-e" if content[0] == "true" else "-d"
-        return sp.run(["../catcoder/meow",c,content[1].strip()],capture_output=True).stdout
+        path = "../catcoder/meow"
+        return sp.run([path,c,content[1].strip()],capture_output=True).stdout
     else:
         return "message too long >:c"
        
 def notfound():
-    page = generage( read_page( "templates/notfound"))
+    page = generate( read_page( "templates/notfound"))
     return ( page, Handler.HTTP_NOT, FILE_TYPE["html"])
 
 def handle( request, path, content):
