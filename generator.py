@@ -17,7 +17,7 @@ def load_assets():
     with open("data/days.txt") as file:
         DAYS = file.read().split("\n")
 
-    with open("data/emojis.txt", encoding="utf8") as file:
+    with open("data/emojis.txt", encoding="utf-8") as file:
         EMOJIS = file.read().split("\n")
 
 def meow( content):
