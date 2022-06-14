@@ -42,7 +42,8 @@ def meow( content):
     if len(content[1]) < 2048:
         c = "-e" if content[0] == "true" else "-d"
         path = "../catcoder/meow"
-        return sp.run([path,c,content[1].strip()],capture_output=True).stdout
+        content = content[1].strip()
+        return sp.run([path,c,content],capture_output=True,shell=False).stdout
     else:
         return "message too long >:c"
        
@@ -92,7 +93,7 @@ def xkcd(page_num):
     total_pages = len(links) // per_page
 
     if page_num < 0 or page_num > total_pages:
-        return read_page( "templates/notfound")
+        return notfound() 
        
     links = list(reversed(links))
     links = links[page_num*per_page:page_num*per_page+per_page]
