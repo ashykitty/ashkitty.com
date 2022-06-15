@@ -17,7 +17,8 @@ FILE_TYPE = {
     "html":"text/html",
     "css":"text/css",
     "js":"application/javascript",
-    "text":"text"
+    "txt":"text",
+    "py":"text"
     }
 
 def load_assets():
@@ -31,19 +32,10 @@ def load_assets():
         EMOJIS = file.read().split("\n")
 
 def meow( content):
-    content = content.split(":")
-
-    if len(content) != 2:
-        return notfound()
-
-    if content[0] not in ["true","false"]:
-        return notfound()
-
-    if len(content[1]) < 2048:
-        c = "-e" if content[0] == "true" else "-d"
+    if len(content) < 4096:
         path = "../catcoder/meow"
-        content = content[1].strip()
-        return sp.run([path,c,content],capture_output=True,shell=False).stdout
+        p = sp.Popen([path], stdout=sp.PIPE, stdin=sp.PIPE, shell=False)
+        return p.communicate( input = str.encode(content))[0]
     else:
         return "message too long >:c"
        
@@ -55,22 +47,22 @@ def handle( request, path, content):
     
     files = os.listdir("files")
 
-    if path == "":
+    if path == "/":
         page = generate( read_page( "templates/root"))
         return (page, Handler.HTTP_OK, FILE_TYPE["html"])
     
-    elif path in files:
+    elif path[1:] in files:
         types = {
                }
-        with open(f"files/{path}","rb") as file:
+        with open(f"files{path}","rb") as file:
             ftype = path.split(".")[1]
             return (file.read(), Handler.HTTP_OK, FILE_TYPE[ftype])
 
-    elif path == "meow":
-        return (meow( content), Handler.HTTP_OK, FILE_TYPE["text"])
+    elif path == "/meow":
+        return (meow( content), Handler.HTTP_OK, FILE_TYPE["txt"])
 
-    elif path.startswith("xkcd"):
-        path = path.split("/")
+    elif path.startswith("/xkcd"):
+        path = path[1:].split("/")
         
         if len(path) != 2:
             return notfound()

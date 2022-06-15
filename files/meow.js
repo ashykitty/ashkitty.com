@@ -1,14 +1,13 @@
-async function meow( encode)
+async function meow()
 {
 	const box = document.getElementById("meow_text");	
 	const res = await fetch("/meow",
 		{
 			method: "post",
-			body: encode+':'+box.value
+			body: box.value
 		}
 	);
 	box.value = await res.text();
 }
 
-document.getElementById("encode_btn").addEventListener('click', function(){meow(true)})
-document.getElementById("decode_btn").addEventListener('click', function(){meow(false)})
+document.getElementById("meow_btn").addEventListener('click', meow)

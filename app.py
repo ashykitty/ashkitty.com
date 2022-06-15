@@ -8,9 +8,7 @@ class Handler( socketserver.BaseRequestHandler):
     HTTP_NOT = "HTTP/1.1 404 Not Found\n"
 
     def setup( self):
-        exp = r"^(?P<request>.*) /(?P<path>.*) (.|\n)*\n(?P<content>.*)"
-        
-        self.re_file = re.compile( exp)
+        pass
 
     def send( self, content, code, data_format):
         
@@ -28,11 +26,18 @@ class Handler( socketserver.BaseRequestHandler):
     def handle( self):
 
         data = self.request.recv(1024).decode('utf-8')
-        data = self.re_file.search(data)
         
-        req     = data.group("request")
-        path    = data.group("path")
-        content = data.group("content")
+        content = data.find("\r\n"*2)
+
+        if( content > 0):
+            content = data[content+4:]
+        else:
+            content = ""
+
+        data = data.split(" ")
+
+        req  = data[0]
+        path = data[1] 
 
         page, code, file_type = g.handle( req, path, content)
         self.send( page, code, file_type)
