@@ -6,7 +6,7 @@ import time
 import random
 import os
 
-APP_VERSION = 3.2
+APP_VERSION = 3.4
 
 global DAYS 
 global EMOJIS 
@@ -57,6 +57,14 @@ def handle( request, path, content):
         with open(f"files{path}","rb") as file:
             ftype = path.split(".")[1]
             return (file.read(), Handler.HTTP_OK, FILE_TYPE[ftype])
+
+    elif path == "/emojis":
+        page = read_page( "templates/emojis")
+        emojis = zip( EMOJIS[::3], EMOJIS[1::3], EMOJIS[2::3])
+        page = page.format(
+                EMOJI_LIST = "\n".join(f"<pre>{a}   {b}   {c}</pre>" for a,b,c in emojis)
+                )
+        return ( generate( page), Handler.HTTP_OK, FILE_TYPE["html"])
 
     elif path == "/meow":
         return (meow( content), Handler.HTTP_OK, FILE_TYPE["txt"])
