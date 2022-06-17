@@ -6,7 +6,7 @@ import time
 import random
 import os
 
-APP_VERSION = 3.4
+APP_VERSION = 3.8
 
 global DAYS 
 global EMOJIS 
@@ -43,20 +43,52 @@ def notfound():
     page = generate( read_page( "templates/notfound"))
     return ( page, Handler.HTTP_NOT, FILE_TYPE["html"])
 
-def handle( request, path, content):
+def handle( request, path, content, auth):
     
     files = os.listdir("files")
+    static = os.listdir("static")
+
+    lfiles = os.listdir("private/files")
+    lstatic = os.listdir("private/static")
 
     if path == "/":
-        page = generate( read_page( "templates/root"))
+        btn = "<a href=\"/login\"><button>login</button></a>"
+        page = read_page( "templates/root").format(
+                LOGIN= "" if auth else btn
+                )
+        page = generate( page)
         return (page, Handler.HTTP_OK, FILE_TYPE["html"])
     
     elif path[1:] in files:
-        types = {
-               }
         with open(f"files{path}","rb") as file:
             ftype = path.split(".")[1]
             return (file.read(), Handler.HTTP_OK, FILE_TYPE[ftype])
+
+    elif path[1:] in lfiles:
+        if auth:
+            with open(f"private/files{path}","rb") as file:            
+                ftype = path.split(".")[1]
+                return (file.read(), Handler.HTTP_OK, FILE_TYPE[ftype])
+        else:
+            return notfound()
+
+    elif f"{path[1:]}.html" in static:
+        page = generate( read_page( f"static/{path[1:]}"))
+        return ( page, Handler.HTTP_OK, FILE_TYPE["html"])
+
+    elif f"{path[1:]}.html" in lstatic:
+        if auth:
+            page = generate( read_page( f"private/static/{path[1:]}"))
+            return ( page, Handler.HTTP_OK, FILE_TYPE["html"])
+        else:
+            return notfound()
+
+    elif path == "/files":
+        page = read_page( "templates/files")
+        page = page.format(
+                FILES = "\n".join([f"<a href=\"/{a}\">{a}</a><br>" for a in files])
+                )
+        return ( generate( page), Handler.HTTP_OK, FILE_TYPE["html"])
 
     elif path == "/emojis":
         page = read_page( "templates/emojis")
@@ -65,6 +97,13 @@ def handle( request, path, content):
                 EMOJI_LIST = "\n".join(f"<pre>{a}   {b}   {c}</pre>" for a,b,c in emojis)
                 )
         return ( generate( page), Handler.HTTP_OK, FILE_TYPE["html"])
+
+    elif path == "/auth":
+        with open("private/key") as key:
+            if content == key.read().strip():
+                cookie = f"login_key={content}; expires=Sat, 22 Sep 2029 13:37:00 UTC; path=/"
+                return ( str.encode(cookie), Handler.HTTP_OK, FILE_TYPE["txt"])
+        return ( str.encode("wrong lol"), Handler.HTTP_OK, FILE_TYPE["txt"])
 
     elif path == "/meow":
         return (meow( content), Handler.HTTP_OK, FILE_TYPE["txt"])
@@ -159,7 +198,7 @@ def generate( page):
         DAYS       = get_special_message(),
         BODY       = page,
         STYLE      = "night.css" if night else "style.css",
-        BANNER     = "night.gif" if night else "us2.png"
+        BANNER     = "us_night.png" if night else "us2.png"
     )
 
     return str.encode( page)
