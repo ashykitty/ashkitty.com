@@ -62,7 +62,11 @@ def handle( request, path, content, auth):
     elif path[1:] in files:
         with open(f"files{path}","rb") as file:
             ftype = path.split(".")[1]
-            return (file.read(), Handler.HTTP_OK, FILE_TYPE[ftype])
+            if ftype in FILE_TYPE:
+                ftype = FILE_TYPE[ftype]
+            else:
+                ftype = "application/octet-stream"
+            return (file.read(), Handler.HTTP_OK, ftype)
 
     elif path[1:] in lfiles:
         if auth:

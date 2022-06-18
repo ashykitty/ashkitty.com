@@ -21,7 +21,10 @@ class Handler( socketserver.BaseRequestHandler):
         code += b"Content-Type: "+str.encode(data_format)+b"\n"
         code += b"X-XSS-Protection: 1\n\n"
         
-        self.request.sendall(code+content)
+        try:
+            self.request.sendall(code+content)
+        except:
+            pass
         
     def get_cookies( self, data):
         for line in data.split("\n"):
