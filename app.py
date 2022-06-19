@@ -39,7 +39,9 @@ class Handler( socketserver.BaseRequestHandler):
         code += b"X-Content-Type-Options: nosniff\n"
         code += b"X-Frame-Options: DENY\n"
         code += b"Content-Type: "+str.encode(data_format)+b"\n"
-        code += b"X-XSS-Protection: 1\n\n"
+        code += b"X-XSS-Protection: 1\n"
+        code += b"Referrer-Policy: no-referrer\n"
+        code += b"Permissions-Policy: document-domain=()\n\n"
         
         try:
             self.request.sendall(code+content)
