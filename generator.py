@@ -1,25 +1,14 @@
-from datetime import date
-from app import *
-import subprocess as sp
+from importlib import import_module
+from app import Request, Handler
 from datetime import datetime
-import time
+from datetime import date
+import subprocess as sp
 import random
+import time
 import os
-
-APP_VERSION = 3.8
 
 global DAYS 
 global EMOJIS 
-
-FILE_TYPE = {
-    "png":"image/png",
-    "gif":"image/gif",
-    "html":"text/html",
-    "css":"text/css",
-    "js":"application/javascript",
-    "txt":"text",
-    "py":"text"
-    }
 
 def load_assets():
     global DAYS 
@@ -30,156 +19,76 @@ def load_assets():
 
     with open("data/emojis.txt", encoding="utf-8") as file:
         EMOJIS = file.read().split("\n")
-
-def meow( content):
-    if len(content) < 4096:
-        path = "../catcoder/meow"
-        p = sp.Popen([path], stdout=sp.PIPE, stdin=sp.PIPE, shell=False)
-        return p.communicate( input = str.encode(content))[0]
-    else:
-        return "message too long >:c"
-       
+      
 def notfound():
-    page = generate( read_page( "templates/notfound"))
-    return ( page, Handler.HTTP_NOT, FILE_TYPE["html"])
+    with open( "templates/notfound.html") as page:
+        page = page.read()
 
-def handle( request, path, content, auth):
-    
-    files = os.listdir("files")
-    static = os.listdir("static")
+    page = generate( page)
+    return ( page, Handler.HTTP_NOT, Handler.FILE_TYPE["html"])
 
-    lfiles = os.listdir("private/files")
-    lstatic = os.listdir("private/static")
+def handle_path( path, request):
+    service_path = f"{path}services{request.path}"
+    if os.path.exists( f"{service_path}.py"):
+        module_path = service_path.replace("/",".")
+        module = import_module( module_path)
+        return module.serve( request)
 
-    if path == "/":
-        btn = "<a href=\"/login\"><button>login</button></a>"
-        page = read_page( "templates/root").format(
-                LOGIN= "" if auth else btn
-                )
-        page = generate( page)
-        return (page, Handler.HTTP_OK, FILE_TYPE["html"])
-    
-    elif path[1:] in files:
-        with open(f"files{path}","rb") as file:
-            ftype = path.split(".")[1]
-            if ftype in FILE_TYPE:
-                ftype = FILE_TYPE[ftype]
-            else:
-                ftype = "application/octet-stream"
+    filepath = f"{path}files{request.path}"
+    if os.path.exists( filepath):
+        with open( filepath, "rb") as file:
+            ftype = filepath.split(".")[-1]
+            ftype = Handler.FILE_TYPE[ftype if ftype in Handler.FILE_TYPE else "bin"]
+
             return (file.read(), Handler.HTTP_OK, ftype)
 
-    elif path[1:] in lfiles:
-        if auth:
-            with open(f"private/files{path}","rb") as file:            
-                ftype = path.split(".")[1]
-                return (file.read(), Handler.HTTP_OK, FILE_TYPE[ftype])
-        else:
-            return notfound()
+    splitpath = request.path.split("/")
+    while len(splitpath) >= 1:
+        newpath = "/".join(splitpath)
 
-    elif f"{path[1:]}.html" in static:
-        page = generate( read_page( f"static/{path[1:]}"))
-        return ( page, Handler.HTTP_OK, FILE_TYPE["html"])
+        pagepath = f"{path}pages{newpath}.html"
 
-    elif f"{path[1:]}.html" in lstatic:
-        if auth:
-            page = generate( read_page( f"private/static/{path[1:]}"))
-            return ( page, Handler.HTTP_OK, FILE_TYPE["html"])
-        else:
-            return notfound()
+        splitpath.pop()
 
-    elif path == "/files":
-        page = read_page( "templates/files")
-        page = page.format(
-                FILES = "\n".join([f"<a href=\"/{a}\">{a}</a><br>" for a in files])
-                )
-        return ( generate( page), Handler.HTTP_OK, FILE_TYPE["html"])
+        if os.path.exists( pagepath):
+            with open( pagepath) as page:
+                page = page.read()
 
-    elif path == "/emojis":
-        page = read_page( "templates/emojis")
-        emojis = zip( EMOJIS[::3], EMOJIS[1::3], EMOJIS[2::3])
-        page = page.format(
-                EMOJI_LIST = "\n".join(f"<pre>{a}   {b}   {c}</pre>" for a,b,c in emojis)
-                )
-        return ( generate( page), Handler.HTTP_OK, FILE_TYPE["html"])
-
-    elif path == "/auth":
-        with open("private/key") as key:
-            if content == key.read().strip():
-                cookie = f"login_key={content}; expires=Sat, 22 Sep 2029 13:37:00 UTC; path=/"
-                return ( str.encode(cookie), Handler.HTTP_OK, FILE_TYPE["txt"])
-        return ( str.encode("wrong lol"), Handler.HTTP_OK, FILE_TYPE["txt"])
-
-    elif path == "/meow":
-        return (meow( content), Handler.HTTP_OK, FILE_TYPE["txt"])
-
-    elif path.startswith("/xkcd"):
-        path = path[1:].split("/")
-        
-        if len(path) != 2:
-            return notfound()
-        else:
-            if path[1].isnumeric():
-                page = generate( xkcd( path[1]))
-                return ( page, Handler.HTTP_OK, FILE_TYPE["html"])
-            else:
-                return notfound()
-    else:
-        return notfound()
-
-def xkcd(page_num):
-    page_num = int(page_num)
-    per_page = 8
+            genpath = f"{path}generators{newpath}"
+            if os.path.exists( f"{genpath}.py"):
+                module_path = genpath.replace("/",".")
+                module = import_module( module_path)
+                page = module.generate( page, request)
+                if not page:
+                    return None
     
-    with open("data/xkcd2.txt") as file:
-        links = file.read().split("\n")
-        
-    total_pages = len(links) // per_page
+            page = generate( page) 
+            return ( page, Handler.HTTP_OK, Handler.FILE_TYPE["html"])
 
-    if page_num < 0 or page_num > total_pages:
-        return notfound() 
-       
-    links = list(reversed(links))
-    links = links[page_num*per_page:page_num*per_page+per_page]
+    return None
+ 
+def handle( request):
+   
+    if request.path == "/":
+        request.path = "/root"
 
-    post = read_page( "templates/xkcd_post", False)
-    posts = ""
+    public = handle_path( "public/", request)
 
-    for link in links:
-        title = link.split("/")[-1].split(".")[0]
-        title = title.replace("_"," ")
-        posts += post.format(TITLE=title,LINK=link)
-    
-    posts = add_emojis( posts)
+    if public:
+        return public
 
-    btn = "<a href=\"/xkcd/{}\"><button>{}</button></a>"
+    if request.auth:
+        private = handle_path( "private/", request)
+        if private:
+            return private 
 
-    xkcd_page = read_page( "templates/xkcd").format(
-            BODY =posts,
-            PAGES=f"{page_num}/{total_pages}",
-            FIRST=btn.format(0,"&lt&lt") if page_num > 0 else "",
-            LAST =btn.format(total_pages if page_num < total_pages else "","&gt&gt"),
-            PREV =btn.format(page_num-1,"&lt") if page_num > 0 else "",
-            NEXT =btn.format(page_num+1,"&gt") if page_num < total_pages else "",
-            PAGE=f"{page_num}"
-        )
-
-    return xkcd_page
+    return notfound()
 
 def add_emojis( html):
     while "(EMOJI)" in html:
         html = html.replace( "(EMOJI)", random.choice( EMOJIS), 1)
     return html
 
-def read_page( page_name, emojis = True):
-    try:
-        with open( f"{page_name}.html", encoding="utf-8") as page:
-            if emojis:
-                return add_emojis( page.read())
-            else:
-                return page.read()
-    except:
-        return None
-    
 def is_night():
     return time.localtime().tm_hour < 6 
 
@@ -192,19 +101,22 @@ def get_special_message():
     else:
         return f"{days_since} {random.choice(DAYS)} days with u <3"
 
-def generate( page):
+def generate( body):
 
     night = is_night() 
 
-    page = read_page( "templates/base").format(
+    with open( "templates/base.html") as page:
+        page = page.read()
+
+    page = page.format(
         TITLE      = "ash's page",
-        VERSION    = APP_VERSION,
+        VERSION    = Handler.VERSION,
         DAYS       = get_special_message(),
-        BODY       = page,
-        STYLE      = "night.css" if night else "style.css",
+        BODY       = body,
+        STYLE      = "night.css"    if night else "style.css",
         BANNER     = "us_night.png" if night else "us2.png"
     )
 
-    return str.encode( page)
+    return str.encode( add_emojis( page))
 
 load_assets()
