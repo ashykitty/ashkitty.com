@@ -1,0 +1,11 @@
+{CODE}
+Content-Type: {CONTENT_TYPE}
+Strict-Transport-Security: max-age=63072000; preload
+Content-Security-Policy: default-src 'self'; img-src 'self' *.xkcd.com; script-src 'self'
+X-Content-Type-Options: nosniff
+X-Frame-Options: DENY
+X-XSS-Protection: 1
+Referrer-Policy: no-referrer
+Permissions-Policy: document-domain=()
+
+{CONTENT}

@@ -13,8 +13,8 @@ class Handler( socketserver.BaseRequestHandler):
     
     VERSION = 4.0
 
-    HTTP_OK = "HTTP/1.1 200 OK\n"
-    HTTP_NOT = "HTTP/1.1 404 Not Found\n"
+    HTTP_OK = "HTTP/1.1 200 OK"
+    HTTP_NOT = "HTTP/1.1 404 Not Found"
 
     FILE_TYPE = {
         "png":"image/png",
@@ -28,23 +28,19 @@ class Handler( socketserver.BaseRequestHandler):
     }
 
     def setup( self):
-        pass
+        with open( "data/header.txt") as header:
+            self.header = header.read()[:-1]
 
     def send( self, content, code, data_format):
       
-        code = str.encode( code)
-        code += b"Strict-Transport-Security: max-age=63072000; preload\n"
-        code += b"Content-Security-Policy: default-src 'self';"
-        code += b"img-src 'self' *.xkcd.com;script-src 'self'\n"
-        code += b"X-Content-Type-Options: nosniff\n"
-        code += b"X-Frame-Options: DENY\n"
-        code += b"Content-Type: "+str.encode(data_format)+b"\n"
-        code += b"X-XSS-Protection: 1\n"
-        code += b"Referrer-Policy: no-referrer\n"
-        code += b"Permissions-Policy: document-domain=()\n\n"
-        
+        code = str.encode( self.header.format(
+            CODE         = code,
+            CONTENT_TYPE = data_format,
+            CONTENT      = content 
+        ))
+       
         try:
-            self.request.sendall(code+content)
+            self.request.sendall( code)
         except:
             pass
         

@@ -117,6 +117,6 @@ def generate( body):
         BANNER     = "us_night.png" if night else "us2.png"
     )
 
-    return str.encode( add_emojis( page))
+    return add_emojis( page)
 
 load_assets()
