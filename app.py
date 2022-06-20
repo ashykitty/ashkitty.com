@@ -35,9 +35,13 @@ class Handler( socketserver.BaseRequestHandler):
       
         code = str.encode( self.header.format(
             CODE         = code,
-            CONTENT_TYPE = data_format,
-            CONTENT      = content 
+            CONTENT_TYPE = data_format
         ))
+        
+        if type( content) == str:
+            code += str.encode( content)
+        else:
+            code += content
        
         try:
             self.request.sendall( code)

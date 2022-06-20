@@ -40,7 +40,12 @@ def handle_path( path, request):
             ftype = filepath.split(".")[-1]
             ftype = Handler.FILE_TYPE[ftype if ftype in Handler.FILE_TYPE else "bin"]
 
-            return (file.read(), Handler.HTTP_OK, ftype)
+            content = file.read()
+
+            if "text" in ftype:
+                content = content.decode()
+
+            return ( content, Handler.HTTP_OK, ftype)
 
     splitpath = request.path.split("/")
     while len(splitpath) >= 1:
