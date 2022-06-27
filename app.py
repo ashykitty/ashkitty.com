@@ -86,10 +86,14 @@ class Handler( socketserver.BaseRequestHandler):
 
         data = data.split(" ")
 
-        req  = data[0]
-        path = data[1] 
+        if len(data) >= 2:
+            req  = data[0]
+            path = data[1] 
 
-        page, code, file_type = g.handle( Request( req, path, content, auth))
+            page, code, file_type = g.handle( Request( req, path, content, auth))
+
+        else:
+            page, code, file_type = g.notfound()
 
         self.send( page, code, file_type)
         
