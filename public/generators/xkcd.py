@@ -9,10 +9,10 @@ def generate( page, request):
 
 def xkcd( page, page_num):
     page_num = int(page_num)
-    per_page = 8
+    per_page = 16
     
     with open("data/xkcd2.txt") as file:
-        links = file.read().split("\n")
+        links = file.read().split("\n")[:-1]
         
     total_pages = len(links) // per_page
 
