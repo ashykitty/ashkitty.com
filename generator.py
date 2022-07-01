@@ -27,27 +27,48 @@ def notfound():
     page = generate( page)
     return ( page, Handler.HTTP_NOT, Handler.FILE_TYPE["html"])
 
-def handle_path( path, request):
+def handle_service( path, request):
     service_path = f"{path}services{request.path}"
+
     if os.path.exists( f"{service_path}.py"):
         module_path = service_path.replace("/",".")
         module = import_module( module_path)
         return module.serve( request)
 
+    return None
+
+def handle_file( path, request):
     filepath = f"{path}files{request.path}"
-    if os.path.exists( filepath):
-        with open( filepath, "rb") as file:
-            ftype = filepath.split(".")[-1]
-            ftype = Handler.FILE_TYPE[ftype if ftype in Handler.FILE_TYPE else "bin"]
 
-            content = file.read()
+    if not os.path.exists( filepath):
+        return None
+    
+    with open( filepath, "rb") as file:
+        ftype = filepath.split(".")[-1]
+        ftype = Handler.FILE_TYPE[ftype if ftype in Handler.FILE_TYPE else "bin"]
 
-            if "text" in ftype:
-                content = content.decode()
+        content = file.read()
 
-            return ( content, Handler.HTTP_OK, ftype)
+        if "text" in ftype:
+            content = content.decode()
+
+        return ( content, Handler.HTTP_OK, ftype)
+    
+    return None
+
+
+def handle_path( path, request):
+
+    service = handle_service( path, request)
+    if service:
+        return service
+
+    file = handle_file( path, request)
+    if file:
+        return file
 
     splitpath = request.path.split("/")
+
     while len(splitpath) >= 1:
         newpath = "/".join(splitpath)
 
@@ -55,20 +76,25 @@ def handle_path( path, request):
 
         splitpath.pop()
 
-        if os.path.exists( pagepath):
-            with open( pagepath) as page:
-                page = page.read()
+        if not os.path.exists( pagepath):
+            continue
+        
+        with open( pagepath) as page:
+            page = page.read()
 
-            genpath = f"{path}generators{newpath}"
-            if os.path.exists( f"{genpath}.py"):
-                module_path = genpath.replace("/",".")
-                module = import_module( module_path)
-                page = module.generate( page, request)
-                if not page:
-                    return None
+        genpath = f"{path}generators{newpath}"
+
+        if os.path.exists( f"{genpath}.py"):
+            module_path = genpath.replace("/",".")
+            module = import_module( module_path)
+
+            page = module.generate( page, request)
+                
+            if not page:
+                return None
     
-            page = generate( page) 
-            return ( page, Handler.HTTP_OK, Handler.FILE_TYPE["html"])
+        page = generate( page) 
+        return ( page, Handler.HTTP_OK, Handler.FILE_TYPE["html"])
 
     return None
  
