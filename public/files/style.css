@@ -35,7 +35,7 @@ textarea {
 
 .banner {
 	box-shadow: none;
-	width: 50%;
+	width: auto;
 	-webkit-animation-name: wiggle;	
 	-webkit-animation-duration: 2000ms;
 	-webkit-animation-iteration-count: infinite;	
@@ -72,8 +72,9 @@ h2 {
 	margin:2%;
 	margin-left:auto;
 	margin-right:auto;
-	width: auto;
 	box-shadow: 0px 0px 0px 0px rgb(0 0 0 0);
+	width: auto;
+	max-width: 80%;
 }
 
 .title {
@@ -98,6 +99,7 @@ img {
 	width: 50%;
 	height: auto;
 	padding: 2%;
+	max-width: 100%;
 }
 
 button {

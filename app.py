@@ -11,7 +11,7 @@ class Request:
 
 class Handler( socketserver.BaseRequestHandler):
     
-    VERSION = 4.0
+    VERSION = 4.1
 
     HTTP_OK = "HTTP/1.1 200 OK"
     HTTP_NOT = "HTTP/1.1 404 Not Found"
