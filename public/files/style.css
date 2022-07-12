@@ -35,7 +35,7 @@ textarea {
 
 .banner {
 	box-shadow: none;
-	width: auto;
+	width: 40%;
 	-webkit-animation-name: wiggle;	
 	-webkit-animation-duration: 2000ms;
 	-webkit-animation-iteration-count: infinite;	
@@ -50,6 +50,7 @@ textarea {
 
 a {
 	color:#FFFFFF;
+	display: contents; 
 }
 
 #days {
