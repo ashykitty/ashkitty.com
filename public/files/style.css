@@ -1,12 +1,12 @@
 .fancyhalf,.fancy{
 	box-shadow: 8px 8px 4px 4px rgb(0 0 0 / 10%);
-	border-radius: 4px;
-	outline: 2px dotted #CA93F4;
+	border-radius: 4px 4px 0px 0px;
+	outline: 1px solid #CA93F4;
 	outline-offset: 2px;
 	background: #f3f7ff38;
-	margin: 1%;
-	margin-bottom: 2%;
+	margin: 4px;
 	padding-bottom: 0px;
+	padding-bottom: 2px;
 	width: 48%;
 	float: left;
 	display: block;
@@ -14,7 +14,7 @@
 }
 
 .fancy {
-	width: 98%;
+	width: 100%;
 }
 
 textarea {
@@ -24,13 +24,14 @@ textarea {
 	width: 80%;
 	font-size: 18px;
 	line-height: 16px;
-	margin: 2%;
+	margin: 2px;
 	padding: 0px;
 	border: 0px;
 }
 
 .emoji {
 	color: #c397e9;
+	font-size: 12px;
 }
 
 .banner {
@@ -55,7 +56,7 @@ a {
 
 #days {
 	margin: 0%;
-	margin-bottom: 0.5%;
+	margin-bottom: 0px;
 	width:100%;
 	text-align:right;
 }
@@ -66,34 +67,37 @@ h1 {
 
 h2 {
 	display:inline;
+	margin: 0px;
 }
 
+h3 {
+	margin: 2px;
+}
+
+.title h3 {
+}
 .xkcd_img {
 	display: block;
-	margin:2%;
+	padding: 1%;
 	margin-left:auto;
 	margin-right:auto;
 	box-shadow: 0px 0px 0px 0px rgb(0 0 0 0);
 	width: auto;
-	max-width: 80%;
+	max-width: 40%;
 }
 
 .title {
 	text-shadow: 0px 0px 0 #7A7A7A;
+	border-radius: 4px 4px 0px 0px;
 	background: #9059ff94;
-	margin:0px;
-	padding: 0%;	
+	margin: 0px;
+	padding: 2px;	
 	height:1%;
-	width: 100%;
+	width: auto;
 	text-align: center;	
 	display: flex;	
 	justify-content: space-between;
-}
-
-.title h3{
-	margin: 1%;
-	margin-left: 2.0%;
-	margin-right: 2.0%;
+	margin-bottom: 2px;
 }
 
 img {
@@ -107,11 +111,11 @@ button {
 	cursor:pointer;
 	text-shadow: 0px 0px 0 #7A7A7A;
 	color: #FFFFFF;
-	padding: 2%;
-	margin: 1%;
-	border-radius: 4px;
+	padding: 2px;
+	margin: 2px;
+	border-radius: 2px;
 	
-	font-size: 18px;
+	font-size: 14px;
 	line-height: 10px;
 	font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 	font-weight: 700;
@@ -129,7 +133,6 @@ button:hover {
 	color: #000000;
 }
 
-
 html {
     min-height: 100%;
 }
@@ -139,7 +142,7 @@ body {
 	padding-left: 10%;
 	padding-right: 10%;
 	font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
-	font-size: 18px;
+	font-size: 14px;
 	letter-spacing: -0.8px;
 	word-spacing: 2px;
 	color: #FFFFFF;

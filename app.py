@@ -24,7 +24,8 @@ class Handler( socketserver.BaseRequestHandler):
         "js":"application/javascript",
         "txt":"text",
         "py":"text",
-        "bin":"application/octet-stream"
+        "bin":"application/octet-stream",
+        "svg":"image/svg+xml"
     }
 
     def setup( self):

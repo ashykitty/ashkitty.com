@@ -144,8 +144,8 @@ def generate( body):
         VERSION    = Handler.VERSION,
         DAYS       = get_special_message(),
         BODY       = body,
-        STYLE      = "night.css"    if night else "style.css",
-        BANNER     = "us_night.png" if night else "us2.png"
+        STYLE      = "style.css"    if night else "style.css",
+        BANNER     = "us2.svg" if night else "us2.svg"
     )
 
     return add_emojis( page)
