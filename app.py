@@ -1,5 +1,6 @@
 import generator as g 
 import socketserver
+import secrets
 import re
 
 class Request:
@@ -36,7 +37,8 @@ class Handler( socketserver.BaseRequestHandler):
       
         code = str.encode( self.header.format(
             CODE         = code,
-            CONTENT_TYPE = data_format
+            CONTENT_TYPE = data_format,
+            NONCE        = secrets.token_hex()
         ))
         
         if type( content) == str:
@@ -57,7 +59,7 @@ class Handler( socketserver.BaseRequestHandler):
                 cookies_dict = {}
                 
                 for cookie in cookies:
-                    key,value = cookie.split("=")
+                    key,value = cookie.split("=",1)
                     cookies_dict[key.strip()] = value.strip()
 
                 return cookies_dict

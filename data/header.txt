@@ -1,6 +1,6 @@
 {CODE}
 Content-Type: {CONTENT_TYPE}
-Content-Security-Policy: default-src 'self'; img-src 'self' *.xkcd.com; script-src 'self'
+Content-Security-Policy: default-src 'self'; img-src 'self' *.xkcd.com; script-src 'self' 'nonce-{NONCE}'
 X-Frame-Options: DENY
 X-XSS-Protection: 1
 Referrer-Policy: no-referrer

@@ -61,6 +61,9 @@ a {
 	text-align:right;
 }
 
+p {
+	margin:0px;
+}
 h1 {
 	margin:0px;
 }
@@ -135,6 +138,11 @@ button:hover {
 
 html {
     min-height: 100%;
+}
+
+#glider {
+	width:20px;
+	padding:0px;
 }
 
 body {
