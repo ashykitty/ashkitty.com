@@ -7,10 +7,9 @@
 	margin: 4px;
 	padding-bottom: 0px;
 	padding-bottom: 2px;
-	width: 48%;
-	float: left;
-	display: block;
+	width: 100%;
 	line-height: 80%;
+	display: block;
 }
 
 .fancy {
@@ -27,6 +26,19 @@ textarea {
 	margin: 2px;
 	padding: 0px;
 	border: 0px;
+}
+
+.vertical {
+	display: flex;
+	justify-content: space-evenly;
+	align-items: flex-start;
+	flex-direction: column;
+}
+
+.horizontal {
+	display: flex;
+	justify-content: space-evenly;
+	align-items: flex-start;
 }
 
 .emoji {
@@ -63,6 +75,7 @@ a {
 
 p {
 	margin:0px;
+	padding: 4px;
 }
 h1 {
 	margin:0px;
