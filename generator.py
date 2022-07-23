@@ -42,6 +42,9 @@ def handle_file( path, request):
 
     if not os.path.exists( filepath):
         return None
+
+    if not os.path.isfile( filepath):
+        return None
     
     with open( filepath, "rb") as file:
         ftype = filepath.split(".")[-1]
@@ -60,6 +63,7 @@ def handle_file( path, request):
 def handle_path( path, request):
 
     service = handle_service( path, request)
+
     if service:
         return service
 
@@ -102,6 +106,8 @@ def handle( request):
    
     if request.path == "/":
         request.path = "/root"
+    elif request.path == "/root":
+        return notfound()
 
     public = handle_path( "public/", request)
 
