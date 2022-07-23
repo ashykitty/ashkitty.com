@@ -96,6 +96,9 @@ def handle_path( path, request):
                 
             if not page:
                 return None
+        else:
+            if request.path.count("/") > 1:
+                return notfound()
     
         page = generate( page) 
         return ( page, Handler.HTTP_OK, Handler.FILE_TYPE["html"])
@@ -106,7 +109,7 @@ def handle( request):
    
     if request.path == "/":
         request.path = "/root"
-    elif request.path == "/root":
+    elif request.path.startswith( "/root"):
         return notfound()
 
     public = handle_path( "public/", request)
